@@ -70,7 +70,7 @@ export default function Page() {
 
   return (
     <S.Wrapper>
-      <h1>Login - MOTOR DE BUSCA SPHERE</h1>
+      <h1>Login - PCMS</h1>
       <S.FormWrapper>
         <Divider />
         <Form

@@ -15,7 +15,7 @@ export async function login({
   try {
     const response = await new HttpClient().request<AxiosResponse>(
       'POST',
-      `${BASE_URL}/auths/login`,
+      `${BASE_URL}/auth/login`,
       {
         email,
         password

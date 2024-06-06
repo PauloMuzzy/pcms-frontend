@@ -125,16 +125,15 @@ export default function Page() {
                 }
               }}
               render={({ field }) => (
-                <Input
+                <Input.Password
                   {...field}
-                  placeholder="* * * * * *"
                   disabled={isLoading}
+                  placeholder="* * * * * *"
                   size="large"
                 />
               )}
             />
           </Form.Item>
-          <Divider />
           <S.FormButtonWrapper>
             <Button
               type="primary"

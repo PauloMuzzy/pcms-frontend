@@ -3,12 +3,10 @@ import axios, { AxiosInstance, AxiosRequestConfig } from 'axios'
 class HttpClient {
   private instance: AxiosInstance
 
-  constructor() {
+  constructor(private readonly token?: string) {
     this.instance = axios.create()
-  }
-
-  public setToken(token: string): void {
-    this.instance.defaults.headers.common['Authorization'] = `Bearer ${token}`
+    if (this.token)
+      this.instance.defaults.headers.common['Authorization'] = `Bearer ${token}`
   }
 
   public async request<T>(
@@ -24,7 +22,7 @@ class HttpClient {
 
     try {
       const response = await this.instance.request<T>(config)
-      return response.data
+      return response as T
     } catch (error) {
       throw error
     }

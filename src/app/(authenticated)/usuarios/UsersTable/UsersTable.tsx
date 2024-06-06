@@ -2,14 +2,14 @@
 
 import Notification from '@/app/components/Notification/Notification'
 
-import type { TableColumnsType } from 'antd'
-import { Alert, Button, Spin, Table } from 'antd'
-import React, { useEffect, useState } from 'react'
-import * as S from './styles'
 import {
   FindAllUsersResponseProps,
   findAllUsers
 } from '@/services/user/find-all-users'
+import type { TableColumnsType } from 'antd'
+import { Alert, Button, Spin, Table } from 'antd'
+import React, { useEffect, useState } from 'react'
+import * as S from './styles'
 
 type UserTableProps = {
   shouldUpdate: boolean

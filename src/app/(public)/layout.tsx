@@ -8,5 +8,5 @@ export default function AuthenticatedLayout({
 }: {
   children: ReactNode
 }) {
-  return <S.Wrapper>{children}</S.Wrapper>
+  return <S.Wrapper className="gradient-background">{children}</S.Wrapper>
 }

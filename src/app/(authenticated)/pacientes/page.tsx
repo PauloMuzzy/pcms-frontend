@@ -1,15 +1,34 @@
 'use client'
 import Notification from '@/app/components/Notification/Notification'
-import { PlusOutlined } from '@ant-design/icons'
+import {
+  FindAllPatientsResponseProps,
+  findAllPatients
+} from '@/services/patient/find-all-patients'
+import { DateUtils } from '@/utils/functions/formatDate'
+import {
+  DeleteOutlined,
+  DownOutlined,
+  PlusOutlined,
+  UserOutlined
+} from '@ant-design/icons'
 import type { TableColumnsType } from 'antd'
-import { Alert, Button, Divider, Modal, Spin, Table } from 'antd'
+import {
+  Alert,
+  Avatar,
+  Button,
+  Divider,
+  Dropdown,
+  Modal,
+  Space,
+  Spin,
+  Table
+} from 'antd'
 import { useEffect, useState } from 'react'
 import * as S from './styles'
-import { DataType } from './types'
 
 export default function Page() {
   const [isLoading, setIsLoading] = useState(true)
-  const [dataTable, setDataTable] = useState<DataType[]>([])
+  const [dataTable, setDataTable] = useState<FindAllPatientsResponseProps[]>([])
   const [modalIsOpen, setModalIsOpen] = useState(false)
   const [confirmLoading, setConfirmLoading] = useState(false)
   const [shouldUpdateTable, setShouldUpdateTable] = useState(false)
@@ -18,35 +37,32 @@ export default function Page() {
     setShouldUpdateTable((prevState) => !prevState)
   }
 
-  const columns: TableColumnsType<DataType> = [
+  const columns: TableColumnsType<FindAllPatientsResponseProps> = [
     {
-      title: 'id',
-      dataIndex: 'id',
-      key: 'id',
+      title: 'Foto',
+      dataIndex: 'photo',
+      key: 'photo',
+      render: (photo) => <Avatar size="large" icon={<UserOutlined />} />,
       width: '5%'
     },
     {
       title: 'Nome',
       dataIndex: 'name',
       key: 'name',
-      width: '10%'
-    },
-    {
-      title: 'Sobrenome',
-      dataIndex: 'lastName',
-      key: 'lastName',
+      render: (text, record) => `${record.name} ${record.lastName}`,
       width: '10%'
     },
     {
       title: 'Email',
       dataIndex: 'email',
       key: 'email',
-      width: '20%'
+      width: '15%'
     },
     {
       title: 'Data de Nascimento',
       dataIndex: 'dateOfBirth',
       key: 'dateOfBirth',
+      render: (text, record) => DateUtils.formatDate(record.dateOfBirth),
       width: '10%'
     },
     {
@@ -58,20 +74,41 @@ export default function Page() {
       width: '10%'
     },
     {
-      title: 'Tipo de Acesso',
-      dataIndex: 'accessType',
-      key: 'accessType',
-      width: '10%'
-    },
-    {
-      title: 'Action',
+      title: 'Ação',
       dataIndex: '',
-      render: (record) => <a onClick={() => console.log(record.id)}>Remover</a>,
+      render: (text, record) => (
+        <Dropdown
+          menu={{
+            items: [
+              {
+                key: '1',
+                label: (
+                  <Button
+                    onClick={() => console.log(record.id)}
+                    danger
+                    icon={<DeleteOutlined />}
+                    style={{ width: '100%' }}
+                  >
+                    Desativar paciente
+                  </Button>
+                )
+              }
+            ]
+          }}
+        >
+          <a onClick={(e) => e.preventDefault()}>
+            <Space>
+              Abir
+              <DownOutlined />
+            </Space>
+          </a>
+        </Dropdown>
+      ),
       width: '5%'
     }
   ]
 
-  const mapData = (data: DataType[]) => {
+  const mapData = (data: FindAllPatientsResponseProps[]) => {
     return data.map((item) => ({
       ...item,
       key: item.id
@@ -79,138 +116,16 @@ export default function Page() {
   }
 
   const findDataTable = async () => {
-    console.log('chamou a findDataTable')
     setIsLoading(true)
     try {
-      setTimeout(() => {
-        setDataTable(
-          mapData([
-            {
-              id: 2,
-              name: 'Paulo',
-              lastName: 'Muzzy',
-              email: 'paulo@muzzy.com',
-              dateOfBirth: '2024-06-02',
-              active: 1,
-              accessType: 'adm'
-            },
-            {
-              id: 3,
-              name: 'Ana',
-              lastName: 'Paula',
-              email: 'paulokriger@gmail.com',
-              dateOfBirth: '2024-06-02',
-              active: 1,
-              accessType: 'usr'
-            },
-            {
-              id: 4,
-              name: 'Ronaldo',
-              lastName: 'Messias',
-              email: 'ronaldom32@gmail.com',
-              dateOfBirth: '2024-06-02',
-              active: 1,
-              accessType: 'usr'
-            },
-            {
-              id: 5,
-              name: 'Carlos',
-              lastName: 'Silva',
-              email: 'carloss@gmail.com',
-              dateOfBirth: '2023-05-01',
-              active: 1,
-              accessType: 'usr'
-            },
-            {
-              id: 6,
-              name: 'Maria',
-              lastName: 'Santos',
-              email: 'marias@gmail.com',
-              dateOfBirth: '2022-04-03',
-              active: 1,
-              accessType: 'usr'
-            },
-            {
-              id: 7,
-              name: 'João',
-              lastName: 'Pereira',
-              email: 'joaop@gmail.com',
-              dateOfBirth: '2021-03-04',
-              active: 1,
-              accessType: 'usr'
-            },
-            {
-              id: 8,
-              name: 'Ana',
-              lastName: 'Costa',
-              email: 'anac@gmail.com',
-              dateOfBirth: '2020-02-05',
-              active: 1,
-              accessType: 'usr'
-            },
-            {
-              id: 9,
-              name: 'Pedro',
-              lastName: 'Ribeiro',
-              email: 'pedror@gmail.com',
-              dateOfBirth: '2019-01-06',
-              active: 1,
-              accessType: 'usr'
-            },
-            {
-              id: 10,
-              name: 'Julia',
-              lastName: 'Mendes',
-              email: 'juliam@gmail.com',
-              dateOfBirth: '2018-12-07',
-              active: 1,
-              accessType: 'usr'
-            },
-            {
-              id: 11,
-              name: 'Lucas',
-              lastName: 'Barros',
-              email: 'lucasb@gmail.com',
-              dateOfBirth: '2017-11-08',
-              active: 1,
-              accessType: 'usr'
-            },
-            {
-              id: 12,
-              name: 'Beatriz',
-              lastName: 'Rocha',
-              email: 'beatrizr@gmail.com',
-              dateOfBirth: '2016-10-09',
-              active: 1,
-              accessType: 'usr'
-            },
-            {
-              id: 13,
-              name: 'Gabriel',
-              lastName: 'Ferreira',
-              email: 'gabrielf@gmail.com',
-              dateOfBirth: '2015-09-10',
-              active: 1,
-              accessType: 'usr'
-            },
-            {
-              id: 14,
-              name: 'Luisa',
-              lastName: 'Cardoso',
-              email: 'luisac@gmail.com',
-              dateOfBirth: '2014-08-11',
-              active: 1,
-              accessType: 'usr'
-            }
-          ])
-        )
-        setIsLoading(false)
-      }, 2000)
+      const response = await findAllPatients()
+      setDataTable(response)
+      setIsLoading(false)
     } catch (error: any) {
       setIsLoading(false)
       Notification({
         type: 'error',
-        message: 'Erro ao carregar tabela',
+        message: error.error,
         description: error.message || 'Ocorreu um erro ao carregar a tabela'
       })
       setDataTable([])
@@ -222,12 +137,8 @@ export default function Page() {
   }
 
   const handleOk = () => {
-    setConfirmLoading(true)
-    setTimeout(() => {
-      setModalIsOpen(false)
-      setConfirmLoading(false)
-      updateTable()
-    }, 2000)
+    findDataTable()
+    setModalIsOpen(false)
   }
 
   const handleCancel = () => {

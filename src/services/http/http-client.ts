@@ -1,4 +1,4 @@
-import axios, { AxiosInstance, AxiosRequestConfig } from 'axios'
+import axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from 'axios'
 
 class HttpClient {
   private instance: AxiosInstance
@@ -24,7 +24,13 @@ class HttpClient {
       const response = await this.instance.request<T>(config)
       return response as T
     } catch (error) {
-      throw error
+      if (error instanceof AxiosError) {
+        throw error
+      }
+
+      throw new Error(
+        'Houve um erro ao realizar a requisição. Tente novamente.'
+      )
     }
   }
 }

@@ -139,6 +139,14 @@ table {
   text-align: start;
 }
 
+.ant-drawer-body {
+  padding: 0 !important;
+}
+
+.ant-drawer-content-wrapper {
+  width: 256px !important;
+}
+
 /* BACKGROUND CUSTOM */
 .gradient-background {
   background: linear-gradient(300deg, deepskyblue, darkviolet, blue);

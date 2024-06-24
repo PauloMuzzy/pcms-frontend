@@ -11,4 +11,5 @@ export const Wrapper = styled.div`
   color: #fff;
   font-size: 24px;
   font-weight: 600;
+  background-color: #7395ae;
 `

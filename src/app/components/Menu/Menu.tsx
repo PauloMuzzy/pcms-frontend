@@ -53,7 +53,6 @@ export default function Menu() {
     const currentOpenKey = openKeys.find(
       (key) => stateOpenKeys.indexOf(key) === -1
     )
-    // open
     if (currentOpenKey !== undefined) {
       const repeatIndex = openKeys
         .filter((key) => key !== currentOpenKey)
@@ -65,7 +64,6 @@ export default function Menu() {
           .filter((key) => levelKeys[key] <= levelKeys[currentOpenKey])
       )
     } else {
-      // close
       setStateOpenKeys(openKeys)
     }
   }

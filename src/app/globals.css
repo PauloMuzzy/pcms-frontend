@@ -147,6 +147,10 @@ table {
   width: 256px !important;
 }
 
+.ant-card-body {
+  padding: 0 !important;
+}
+
 /* BACKGROUND CUSTOM */
 .gradient-background {
   background: linear-gradient(300deg, deepskyblue, darkviolet, blue);

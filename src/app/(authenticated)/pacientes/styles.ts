@@ -8,22 +8,32 @@ export const Wrapper = styled.div`
   width: 100%;
 `
 
-export const FormWrapper = styled.form`
+export const FilterWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  width: 100%;
+  height: fit-content;
+  background-color: #f0f0f0;
+`
+
+export const List = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px;
+  width: 100%;
+  height: fit-content;
+  background-color: #f0f0f0;
+`
+
+export const PaginationWrapper = styled.div`
+  display: flex;
   justify-content: center;
-  width: 600px;
-`
-
-export const FormItem = styled.form`
-  display: flex;
-  flex-direction: column;
+  align-items: center;
+  gap: 8px;
   width: 100%;
-`
-
-export const FormButtonWrapper = styled.div`
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
+  height: fit-content;
+  padding: 8px;
 `

@@ -5,12 +5,12 @@ import { getCookie } from 'cookies-next'
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL
 
 export type FindAllPatientsResponseProps = {
-  id: number
+  id: string
   name: string
   lastName: string
   email: string
   dateOfBirth: string
-  gender: number
+  gender: string
   profession: string
   phone: string
   emergencyContactName: string

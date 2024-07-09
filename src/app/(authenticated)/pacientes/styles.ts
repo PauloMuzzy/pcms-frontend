@@ -18,6 +18,13 @@ export const FilterWrapper = styled.div`
   background-color: #f0f0f0;
 `
 
+export const PatientRegistrationWrapper = styled.div`
+  width: 100%;
+  height: fit-content;
+  padding: 8px;
+  background-color: #f0f0f0;
+`
+
 export const List = styled.div`
   display: flex;
   flex-direction: column;

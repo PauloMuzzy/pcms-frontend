@@ -151,6 +151,11 @@ table {
   padding: 0 !important;
 }
 
+.ant-form-item-label {
+  padding: 0 !important;
+  height: min-content !important;
+}
+
 /* BACKGROUND CUSTOM */
 .gradient-background {
   background: linear-gradient(300deg, deepskyblue, darkviolet, blue);

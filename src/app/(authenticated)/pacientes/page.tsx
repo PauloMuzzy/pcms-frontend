@@ -6,12 +6,12 @@ import {
   findAllPatients
 } from '@/services/patient/find-all-patients'
 
-import { Collapse } from 'antd'
+import { Collapse, Pagination } from 'antd'
 import { useState } from 'react'
 
-import PatientFilter from '@/app/(authenticated)/pacientes/PatientFilter/PatientFilter'
 import { FilterOutlined } from '@ant-design/icons'
-import { Pagination } from 'antd'
+
+import PatientRegistrationModal from '@/app/(authenticated)/pacientes/PatientRegistrationModal/PatientRegistrationModal'
 import { useEffect } from 'react'
 import * as S from './styles'
 
@@ -29,14 +29,17 @@ export default function Page() {
   }, [])
 
   function RenderFitler() {
-    return <PatientFilter />
+    return 'filter'
   }
 
   return (
     <S.Wrapper>
+      <S.PatientRegistrationWrapper>
+        <PatientRegistrationModal />
+      </S.PatientRegistrationWrapper>
       <S.FilterWrapper>
         <Collapse
-          expandIconPosition="right"
+          expandIconPosition="end"
           items={[
             {
               key: '1',

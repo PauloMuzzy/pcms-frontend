@@ -56,7 +56,6 @@ export default function ShearchMenu() {
       options={options}
       onSelect={onSelect}
       onSearch={handleSearch}
-      size="large"
     >
       <Input.Search size="large" placeholder="Pesquisar página" enterButton />
     </AutoComplete>

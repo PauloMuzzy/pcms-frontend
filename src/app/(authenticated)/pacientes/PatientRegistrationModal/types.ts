@@ -12,3 +12,9 @@ export interface FormDataProps {
   emergencyContactPhone: string
   emergencyContactRelationship: string
 }
+
+export interface PatientRegistrationModalProps {
+  onFinishRegistration: () => void
+  openModal: boolean
+  setIsModalVisible: (value: boolean) => void
+}

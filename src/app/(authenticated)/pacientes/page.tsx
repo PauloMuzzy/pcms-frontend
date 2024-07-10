@@ -6,7 +6,7 @@ import {
   findAllPatients
 } from '@/services/patient/find-all-patients'
 
-import { Collapse, Pagination } from 'antd'
+import { Button, Collapse, Pagination } from 'antd'
 import { useState } from 'react'
 
 import { FilterOutlined } from '@ant-design/icons'
@@ -18,6 +18,7 @@ import * as S from './styles'
 export default function Page() {
   const [patients, setPatients] = useState<FindAllPatientsResponseProps[]>([])
   const [filter, setFilter] = useState<string>('' as string)
+  const [isModalVisible, setIsModalVisible] = useState<boolean>(false)
 
   const findPatients = async () => {
     const response = await findAllPatients()
@@ -28,14 +29,36 @@ export default function Page() {
     findPatients()
   }, [])
 
+  const handleFinishRegistration = () => {
+    findPatients()
+  }
+
   function RenderFitler() {
     return 'filter'
+  }
+
+  const showModal = () => {
+    setIsModalVisible(true)
   }
 
   return (
     <S.Wrapper>
       <S.PatientRegistrationWrapper>
-        <PatientRegistrationModal />
+        <Button
+          type="primary"
+          onClick={showModal}
+          style={{ width: '100%' }}
+          size="large"
+        >
+          Novo paciente
+        </Button>
+        {isModalVisible && (
+          <PatientRegistrationModal
+            onFinishRegistration={handleFinishRegistration}
+            openModal={isModalVisible}
+            setIsModalVisible={setIsModalVisible}
+          />
+        )}
       </S.PatientRegistrationWrapper>
       <S.FilterWrapper>
         <Collapse

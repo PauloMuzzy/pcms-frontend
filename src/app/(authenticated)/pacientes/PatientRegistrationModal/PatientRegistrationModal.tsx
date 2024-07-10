@@ -1,12 +1,23 @@
-import { FormDataProps } from '@/app/(authenticated)/pacientes/PatientRegistrationModal/types'
+import {
+  FormDataProps,
+  PatientRegistrationModalProps
+} from '@/app/(authenticated)/pacientes/PatientRegistrationModal/types'
 import { OptionResponseModel } from '@/model/option-model'
 import { findOptionList } from '@/services/option-list/find-option-list'
 import { createPatient } from '@/services/patient/create-patient'
+import { capitalizeWords } from '@/utils/functions/capitalizeWords'
+import { cpfMask } from '@/utils/masks/cpf-mask'
+import { phoneMask } from '@/utils/masks/phone-mask'
 import { Button, DatePicker, Form, Input, Modal, Select } from 'antd'
+import moment from 'moment'
 import { useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 
-export default function PatientRegistrationModal() {
+export default function PatientRegistrationModal({
+  onFinishRegistration,
+  openModal,
+  setIsModalVisible
+}: PatientRegistrationModalProps) {
   const [open, setOpen] = useState(false)
   const [confirmLoading, setConfirmLoading] = useState(false)
   const [genderOptionsIsLoading, setGenderOptionsIsLoading] = useState(true)
@@ -16,6 +27,7 @@ export default function PatientRegistrationModal() {
     emergencyContactRelationshipsOptionsIsLoading,
     setEmergencyContactRelationshipsOptionsIsLoading
   ] = useState(true)
+
   const [genderOptions, setGenderOptions] = useState<
     OptionResponseModel[] | []
   >([])
@@ -27,26 +39,9 @@ export default function PatientRegistrationModal() {
     setEmergencyContactRelationshipsOptions
   ] = useState<OptionResponseModel[] | []>([])
 
-  const showModal = () => {
-    setOpen(true)
-  }
-
-  const handleOk = () => {
-    setConfirmLoading(true)
-    setTimeout(() => {
-      reset()
-      setOpen(false)
-      setConfirmLoading(false)
-    }, 2000)
-  }
-
-  const handleCancel = () => {
-    reset()
-    setOpen(false)
-  }
-
   const {
     control,
+    register,
     handleSubmit,
     formState: { errors },
     reset
@@ -62,14 +57,38 @@ export default function PatientRegistrationModal() {
       gender: '',
       registerDate: '',
       emergencyContactName: '',
+      emergencyContactPhone: '',
       emergencyContactRelationship: ''
     },
-    mode: 'onBlur'
+    mode: 'onSubmit'
   })
+
+  useEffect(() => {
+    setOpen(openModal)
+  }, [openModal])
+
+  useEffect(() => {
+    getGenderList()
+    getProfessionList()
+    getEmergencyContactRelationshipsList()
+    reset()
+  }, [])
+
+  const handleCancel = () => {
+    reset()
+    setIsModalVisible(false)
+  }
 
   const onSubmit = async (data: FormDataProps) => {
     try {
-      await createPatient(data)
+      await createPatient({
+        ...data,
+        cpf: data.cpf.replace(/\D/g, ''),
+        phone: data.phone.replace(/\D/g, ''),
+        emergencyContactPhone: data.emergencyContactPhone.replace(/\D/g, '')
+      })
+      onFinishRegistration()
+      setOpen(false)
     } catch (error: any) {
       console.log(error)
     }
@@ -108,27 +127,11 @@ export default function PatientRegistrationModal() {
     }
   }
 
-  useEffect(() => {
-    getGenderList()
-    getProfessionList()
-    getEmergencyContactRelationshipsList()
-    reset()
-  }, [])
-
   return (
     <>
-      <Button
-        type="primary"
-        onClick={showModal}
-        style={{ width: '100%' }}
-        size="large"
-      >
-        Novo paciente
-      </Button>
       <Modal
         title="Cadastrar novo paciente"
-        visible={open}
-        onOk={handleOk}
+        open={open}
         onCancel={handleCancel}
         confirmLoading={confirmLoading}
         footer={[
@@ -137,7 +140,7 @@ export default function PatientRegistrationModal() {
             htmlType="submit"
             onClick={handleCancel}
             danger
-            key={1}
+            key="cancel"
           >
             Cancelar
           </Button>,
@@ -145,7 +148,7 @@ export default function PatientRegistrationModal() {
             type="primary"
             htmlType="submit"
             onClick={handleSubmit(onSubmit)}
-            key={2}
+            key="submit"
           >
             Cadastrar
           </Button>
@@ -161,12 +164,23 @@ export default function PatientRegistrationModal() {
             <Controller
               name="name"
               control={control}
-              rules={{ required: 'Nome é obrigatório.' }}
+              rules={{
+                required: 'Nome é obrigatório.',
+                pattern: {
+                  value: /^[a-zA-Z\s]*$/,
+                  message: 'Nome deve conter apenas letras.'
+                }
+              }}
               render={({ field }) => (
                 <Input
                   style={{ width: '100%' }}
                   placeholder="Digite o nome"
                   {...field}
+                  onChange={(e) => {
+                    const value = e.target.value
+                    const capitalizedValue = capitalizeWords(value)
+                    field.onChange(capitalizedValue)
+                  }}
                 />
               )}
             />
@@ -180,12 +194,23 @@ export default function PatientRegistrationModal() {
             <Controller
               name="lastName"
               control={control}
-              rules={{ required: 'Sobrenome é obrigatório.' }}
+              rules={{
+                required: 'Sobrenome é obrigatório.',
+                pattern: {
+                  value: /^[a-zA-Z\s]*$/,
+                  message: 'Nome deve conter apenas letras.'
+                }
+              }}
               render={({ field }) => (
                 <Input
                   style={{ width: '100%' }}
                   placeholder="Digite o sobrenome"
                   {...field}
+                  onChange={(e) => {
+                    const value = e.target.value
+                    const capitalizedValue = capitalizeWords(value)
+                    field.onChange(capitalizedValue)
+                  }}
                 />
               )}
             />
@@ -199,12 +224,22 @@ export default function PatientRegistrationModal() {
             <Controller
               name="cpf"
               control={control}
-              rules={{ required: 'CPF é obrigatório.' }}
+              rules={{
+                required: 'CPF é obrigatório.',
+                minLength: {
+                  value: 14,
+                  message: 'CPF deve conter no mínimo 11 dígitos.'
+                }
+              }}
               render={({ field }) => (
                 <Input
                   style={{ width: '100%' }}
                   placeholder="Digite o CPF"
+                  maxLength={14}
                   {...field}
+                  onChange={(e) => {
+                    field.onChange(cpfMask(e.target.value))
+                  }}
                 />
               )}
             />
@@ -218,12 +253,22 @@ export default function PatientRegistrationModal() {
             <Controller
               name="phone"
               control={control}
-              rules={{ required: 'Telefone é obrigatório.' }}
+              rules={{
+                required: 'Telefone é obrigatório.',
+                minLength: {
+                  value: 15,
+                  message: 'Telefone deve conter no mínimo 11 dígitos.'
+                }
+              }}
               render={({ field }) => (
                 <Input
                   style={{ width: '100%' }}
                   placeholder="Digite o Telefone"
+                  maxLength={15}
                   {...field}
+                  onChange={(e) => {
+                    field.onChange(phoneMask(e.target.value))
+                  }}
                 />
               )}
             />
@@ -237,12 +282,23 @@ export default function PatientRegistrationModal() {
             <Controller
               name="email"
               control={control}
-              rules={{ required: 'Email é obrigatório.' }}
+              rules={{
+                required: 'Email é obrigatório.',
+                pattern: {
+                  value: /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/,
+                  message: 'Email inválido.'
+                }
+              }}
               render={({ field }) => (
                 <Input
                   style={{ width: '100%' }}
                   placeholder="Digite o email"
                   {...field}
+                  onChange={(e) => {
+                    field.onChange(
+                      e.target.value.toLocaleLowerCase().replace(/ /g, '')
+                    )
+                  }}
                 />
               )}
             />
@@ -262,6 +318,9 @@ export default function PatientRegistrationModal() {
                   style={{ width: '100%' }}
                   placeholder="Selecione a data"
                   onChange={(date) => field.onChange(date)}
+                  disabledDate={(current) =>
+                    current && current > moment().endOf('day')
+                  }
                 />
               )}
             />
@@ -281,7 +340,10 @@ export default function PatientRegistrationModal() {
                   {...field}
                   placeholder="Selecione a profissão"
                   loading={professionOptionsIsLoading}
-                  options={professionOptions}
+                  options={[
+                    { label: '- Selecione a profissão - ', value: '' },
+                    ...professionOptions
+                  ]}
                 />
               )}
             />
@@ -298,16 +360,19 @@ export default function PatientRegistrationModal() {
               rules={{ required: 'Gênero é obrigatório.' }}
               render={({ field }) => (
                 <Select
-                  {...field}
                   placeholder="Selecione o gênero"
+                  {...field}
                   loading={genderOptionsIsLoading}
-                  options={genderOptions}
+                  options={[
+                    { label: '- Selecione o gênero - ', value: '' },
+                    ...genderOptions
+                  ]}
                 />
               )}
             />
           </Form.Item>
           <Form.Item
-            label="Nome do Contato de Emergência"
+            label="Nome do contato de emergência"
             validateStatus={errors.emergencyContactName && 'error'}
             help={errors.emergencyContactName?.message?.toString()}
             required
@@ -316,19 +381,24 @@ export default function PatientRegistrationModal() {
               name="emergencyContactName"
               control={control}
               rules={{
-                required: 'Nome do Contato de Emergência é obrigatório.'
+                required: 'Nome do contato de emergência é obrigatório.'
               }}
               render={({ field }) => (
                 <Input
                   style={{ width: '100%' }}
-                  placeholder="Digite o nome do contato de emergência"
+                  placeholder="Digite o nome"
                   {...field}
+                  onChange={(e) => {
+                    const value = e.target.value
+                    const capitalizedValue = capitalizeWords(value)
+                    field.onChange(capitalizedValue)
+                  }}
                 />
               )}
             />
           </Form.Item>
           <Form.Item
-            label="Telefone do Contato de Emergência"
+            label="Telefone do contato de emergência"
             validateStatus={errors.emergencyContactPhone && 'error'}
             help={errors.emergencyContactPhone?.message?.toString()}
             required
@@ -337,19 +407,28 @@ export default function PatientRegistrationModal() {
               name="emergencyContactPhone"
               control={control}
               rules={{
-                required: 'Telefone do Contato de Emergência é obrigatório.'
+                required: 'Telefone do contato de emergência é obrigatório.',
+                minLength: {
+                  value: 15,
+                  message:
+                    'Telefone do contato de emergência deve conter no mínimo 11 números.'
+                }
               }}
               render={({ field }) => (
                 <Input
                   style={{ width: '100%' }}
-                  placeholder="Digite o telefone do contato de emergência"
+                  placeholder="Digite o Telefone"
+                  maxLength={15}
                   {...field}
+                  onChange={(e) => {
+                    field.onChange(phoneMask(e.target.value))
+                  }}
                 />
               )}
             />
           </Form.Item>
           <Form.Item
-            label="Parentesco do Contato de Emergência"
+            label="Parentesco do contato de emergência"
             validateStatus={errors.emergencyContactRelationship && 'error'}
             help={errors.emergencyContactRelationship?.message?.toString()}
             required
@@ -358,14 +437,16 @@ export default function PatientRegistrationModal() {
               name="emergencyContactRelationship"
               control={control}
               rules={{
-                required: 'Parentesco do Contato de Emergência é obrigatório.'
+                required: 'Parentesco do contato de emergência é obrigatório.'
               }}
               render={({ field }) => (
                 <Select
                   {...field}
                   loading={emergencyContactRelationshipsOptionsIsLoading}
-                  options={emergencyContactRelationshipsOptions}
-                  defaultActiveFirstOption
+                  options={[
+                    { label: '- Selecione o parentesco - ', value: '' },
+                    ...emergencyContactRelationshipsOptions
+                  ]}
                 />
               )}
             />
